@@ -1,0 +1,165 @@
+\documentclass[11pt]{article}
+%\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{fancybox}%,times}
+\usepackage{graphicx,psfrag,epsf}
+%\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{graphicx,psfrag}
+\usepackage{multirow}
+\usepackage{epsfig}
+\usepackage[svgnames]{xcolor}
+%\usepackage{rotating}
+\usepackage{subfigure}
+\usepackage{theorem}
+\usepackage{natbib,psfrag}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{kotex}
+\newcommand{\blind}{0}
+\usepackage{graphicx}
+\usepackage{listings}
+
+
+%\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+
+% Default fixed font does not support bold face
+\DeclareFixedFont{\ttb}{T1}{txtt}{bx}{n}{12} % for bold
+\DeclareFixedFont{\ttm}{T1}{txtt}{m}{n}{12}  % for normal
+
+% Custom colors
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+\usepackage{listings}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+
+\addtolength{\oddsidemargin}{-.75in}%
+\addtolength{\evensidemargin}{-.75in}%
+\addtolength{\textwidth}{1.5in}%
+\addtolength{\textheight}{1.3in}%
+%\addtolength{\topmargin}{-.6in}%
+\addtolength{\topmargin}{-.8in}%
+
+%\theoremstyle{break}
+\newtheorem{The}{Theorem}
+\newtheorem{Def}{Definition}
+\newtheorem{Pro}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{asp}{Assumption}
+
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+%\renewcommand{\thefootnote}{\alph{footnote}}
+%\renewcommand{\thefootnote}{\roman{footnote}}
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\begin{document}
+	
+	
+	%\bibliographystyle{natbib}
+	
+	\newcommand{\Ito}{$It\hat{o}$'$s~Lemma$}
+	
+	\newcommand\ind{\stackrel{\rm ind}{\sim}}
+	\newcommand\iid{\stackrel{\rm iid}{\sim}}
+	\renewcommand\c{\mathbf{c}}
+	\newcommand\y{\mathbf{y}}
+	\newcommand\z{\mathbf{z}}
+	\renewcommand\P{\mathbf{P}}
+	\newcommand\W{\mathbf{W}}
+	\newcommand\X{\mathbf{X}}
+	\newcommand\Y{\mathbf{Y}}
+	\newcommand\Z{\mathbf{Z}}
+	\newcommand\J{{\cal J}}
+	\newcommand\B{{\cal B}}
+	\newcommand\K{{\cal K}}
+	\newcommand\N{{\rm N}}
+	\newcommand\bs{\boldsymbol}
+	\newcommand\bth{\bs\theta}
+	\newcommand\bbe{\bs\beta}
+	\renewcommand\*{^\star}
+	\newcommand{\notimplies}{%
+		\mathrel{{\ooalign{\hidewidth$\not\phantom{=}$\hidewidth\cr$\implies$}}}}
+	
+	\def\spacingset#1{\renewcommand{\baselinestretch}%
+		{#1}\small\normalsize} \spacingset{1}
+	
+	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	
+	\bigskip
+	\bigskip
+	\bigskip
+	\begin{center}
+		{\LARGE\bf 2019 Oct. 23 }
+	\end{center}
+	\begin{center}
+		2018321084 Juyoung Ahn
+	\end{center}
+	\medskip
+	
+	%\begin{abstract}
+	%\end{abstract}
+	
+	%\noindent%
+	%{\it Key Words:}  AECM algorithm; Astrophysical data analysis;
+	%ECME algorithm; Incompatible Gibbs sampler; Marginal data
+	%augmentation; Multiple imputation; Spectral analysis
+	
+	\spacingset{1.45}
+	\section{Changing point model}
+	\subsection{likelihood and prior}
+	\begin{align*}
+	\beta_t &\iid 
+	 Poisson(\lambda_j)\;\;\; \text{for}\; t=k_{j-1} + 1, \dots ,k_j \\
+	\lambda_j &\sim Gamma(a_j,b_j) \;\;\;\text{for}\;j =  1, \dots, m \\
+	k_j &\sim unif\{k_{j-1} + 1, k_j\} \;\;\;\text{for}\;j =  1, \dots, m 
+	\end{align*}
+	Where $m$ is number of change point, $k_0 = 1$ and $k_{m+1} = T$, Then
+	\begin{align*}
+	p(\boldsymbol{\lambda},\boldsymbol{k}|\boldsymbol{\beta}) \propto \prod_{j=1}^{m} \left[ \exp\left(-(k_{j+1}-k_j)\lambda_j \left[\prod_{t= k_{j-1}}^{k_j}  \lambda_j^{\beta_t}\right] \lambda^{a_j-1} \exp(-b_j\lambda_j)\right)\right]
+	\end{align*}
+	\subsection{Gibbs sampler}
+	\begin{align*}
+	\lambda_j | \boldsymbol{\lambda_{-j}},\boldsymbol{k},\boldsymbol{\beta} &\sim Gamma(a_j + \sum_{t=k_{j-1}+1}^{k_j}\beta_t, k_{j} - k_{j-1} +b_j)\\
+	p(k_j | \boldsymbol{\lambda},\boldsymbol{k_{-j}},\boldsymbol{\beta}) &= \frac{\exp(k_j(\lambda_{j+1}- \lambda_j)+ \log(\lambda_j/\lambda_{j+1})\sum_{t=k_{j-1}+1}^{k_j}\beta_t)}{\sum_{t=k_{j-1}}^{k_j}\exp(k_j(\lambda_{j+1}- \lambda_j)+ \log(\lambda_j/\lambda_{j+1})\sum_{t=k_{j-1}+1}^{k_j}\beta_t)}
+	\end{align*}
+	\subsection{Variational Bayes}
+	\begin{align*}
+	q^*(\lambda_j) &\sim Gamma(a_j + \sum_{t=E_{q^*}[k_{j-1}]+1}^{E_{q^*}[k_j]}\beta_t, E_{q^*}[k_{j}] - E_{q^*}[k_{j-1}] +b_j)\\
+	q^*(k_j)&= \frac{\exp(k_j(E_{q^*}[\lambda_{j+1}]- E_{q^*}[\lambda_j])+ \log(E_{q^*}[\lambda_j]/E_{q^*}[\lambda_{j+1}])\sum_{t=E_{q^*}[k_{j-1}]+1}^{k_j}\beta_t)}{\sum_{t=E_{q^*}[k_{j-1}]}^{k_j}\exp(k_j(E_{q^*}[\lambda_{j+1}]- E_{q^*}[\lambda_j])+ \log(E_{q^*}[\lambda_j]/E_{q^*}[\lambda_{j+1}])\sum_{t=E_{q^*}[k_{j-1}]+1}^{k_j}\beta_t)}
+	\end{align*}
+	We can use
+	\begin{align*}
+	X \sim Gamma(\alpha,\beta)\\
+	E[\log X] = -\log\beta +\psi(\alpha)
+	\end{align*}
+	where $\psi$ means digamma function
+	
+	\section{Simulation}
+	Make simulation data from
+	\begin{align*}
+	\beta_t &\iid \begin{cases}
+	Poisson(1)\;\; t= 1, \dots ,30 \\
+	Poisson(3) \;\; t= 31, \dots ,100
+	\end{cases}
+	\end{align*}
+	
+
+	\subsection{Gibbs}
+	Prior and initial value are
+	\begin{align*}
+	a = 4;\;
+	b = 1;\;
+	c = 1;\;
+	d = 2\\
+	\phi = 1
+	\end{align*}
+
+
+\end{document}

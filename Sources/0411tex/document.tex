@@ -1,0 +1,201 @@
+\documentclass[11pt]{article}
+%\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{fancybox}%,times}
+\usepackage{graphicx,psfrag,epsf}
+%\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{graphicx,psfrag}
+\usepackage{multirow}
+\usepackage{epsfig}
+%\usepackage{rotating}
+\usepackage{subfigure}
+\usepackage{theorem}
+\usepackage{natbib,psfrag}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{kotex}
+\newcommand{\blind}{0}
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+
+\addtolength{\oddsidemargin}{-.75in}%
+\addtolength{\evensidemargin}{-.75in}%
+\addtolength{\textwidth}{1.5in}%
+\addtolength{\textheight}{1.3in}%
+%\addtolength{\topmargin}{-.6in}%
+\addtolength{\topmargin}{-.8in}%
+
+%\theoremstyle{break}
+\newtheorem{The}{Theorem}
+\newtheorem{Def}{Definition}
+\newtheorem{Pro}{Proposition}
+\newtheorem{Lem}{Lemma}
+\newtheorem{Cor}{Corollary}
+\newtheorem{asp}{Assumption}
+
+
+\renewcommand{\thefootnote}{\arabic{footnote}}
+%\renewcommand{\thefootnote}{\alph{footnote}}
+%\renewcommand{\thefootnote}{\roman{footnote}}
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+
+\begin{document}
+
+
+%\bibliographystyle{natbib}
+
+\newcommand{\Ito}{$It\hat{o}$'$s~Lemma$}
+
+\newcommand\ind{\stackrel{\rm ind}{\sim}}
+\newcommand\iid{\stackrel{\rm iid}{\sim}}
+\renewcommand\c{\mathbf{c}}
+\newcommand\y{\mathbf{y}}
+\newcommand\z{\mathbf{z}}
+\renewcommand\P{\mathbf{P}}
+\newcommand\W{\mathbf{W}}
+\newcommand\X{\mathbf{X}}
+\newcommand\Y{\mathbf{Y}}
+\newcommand\Z{\mathbf{Z}}
+\newcommand\J{{\cal J}}
+\newcommand\B{{\cal B}}
+\newcommand\K{{\cal K}}
+\newcommand\N{{\rm N}}
+\newcommand\bs{\boldsymbol}
+\newcommand\bth{\bs\theta}
+\newcommand\bbe{\bs\beta}
+\renewcommand\*{^\star}
+
+\def\spacingset#1{\renewcommand{\baselinestretch}%
+{#1}\small\normalsize} \spacingset{1}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  \bigskip
+  \bigskip
+  \bigskip
+  \begin{center}
+    {\LARGE\bf April 11, 2019 }
+  \end{center}
+  \medskip
+
+%\begin{abstract}
+%\end{abstract}
+
+%\noindent%
+%{\it Key Words:}  AECM algorithm; Astrophysical data analysis;
+%ECME algorithm; Incompatible Gibbs sampler; Marginal data
+%augmentation; Multiple imputation; Spectral analysis
+
+\spacingset{1.45}
+
+
+
+
+
+
+
+
+\section{Introduction}
+Problem involving a large number of parameters, inference is often made on parameters that are selected based on the data.
+
+\subsection{Winner's Curse}
+\begin{itemize}
+	\item The bias introduced by the selection
+	\item Cause the usual confidence interval to have an extremely low coverage porbability
+\end{itemize}
+
+\subsection{Toy Example}
+\begin{align*}
+Y_i | \beta_i&  \stackrel{ind}{\sim}N(\beta_i,1)\\
+\beta_i& \sim \begin{cases} 0 &\text{ with probability 0.8} \\
+N(0,1) &\text{with probability 0.2} \end{cases}
+\end{align*}
+Let $Y_{(1)} = \max_{1\le i \le p} Y_i\;$ and $\;\beta_{(i)}$ be the coreesponding parameter. 
+Constructing usual 95\% confidence interval. $CI_{(1)}=Y_{(1)} \pm 1.95$. As reapeated 10,000 times to simulate the coverage probability. It was 42.4\% and it is easy to see that $E[Y_{(1)}] \ge \beta_{(1)}$.
+
+\begin{itemize}
+	\item Developing a confidence interval for a selected parameter that is statistically sound is important
+	\item Constructing confidence intervals for multiple selected parameters subject to controlling an overall measure of false coverage
+\end{itemize}
+\subsection{Zero Inflated Mixture Prior(ZIMP)}
+\begin{align*}
+\boldsymbol{Y} | \boldsymbol{\beta} \sim f(\boldsymbol{y}|\boldsymbol{\beta})
+\end{align*}
+where $\boldsymbol{\beta} = (\beta_1, \dots, \beta_p)$ and
+\begin{align*}
+\beta_i \sim \pi(\beta_i) = \pi_0 1(\beta_i = 0) + (1-\pi_0) \psi(\beta_i)
+\end{align*}
+$\pi_0$ is the prior of $\beta_i$ being zero, and $\psi(\beta_i)$ is the distribution of $\beta_i$ given $\beta_i \ne 0$
+\begin{itemize}
+	\item This model is useful in genetic experiments where many of the genes are believed to be non-differentially expressed, and in regressions with sparsity structure.
+	\item If $\pi_0$ is large, the posterior probability of $\beta_i$ being 0 can also large
+	\item this is problematic for equal-tail credible interval since it can obtain zero a high proportions of times
+	\item high-posterior-density(HPD) regions : HPD regions always include zero due to the existence of point mass at zero
+\end{itemize}
+\subsection{Credible interval}
+We can say that our $100(1 – \alpha)\%$ credible interval $C$ defines the subset on the parameter space, which we’ll call $\theta$, such that the integral
+\begin{align*}
+\int_{C} \pi(\boldsymbol{\theta} | \boldsymbol{X}) d\boldsymbol{\theta} = 1 - \alpha
+\end{align*}
+$\pi$ here is the posterior probability distribution. So, for instance, if you needed a 95 percent credible interval, you would be working to find the interval over which the integral of the posterior probability distribution sums to 0.95
+
+\begin{itemize}
+	\item Choosing the narrowest interval, which for a unimodal distribution will involve choosing those values of highest probability density including the mode. This is sometimes called the highest posterior density interval.
+	\item Choosing the interval where the probability of being below the interval is as likely as being above it. This interval will include the median. This is sometimes called the equal-tailed interval.
+\end{itemize}
+
+\subsection{Loss Function}
+Consider a loss function that penalizes the inclusion of zero when $\beta_i$ is indeed non-zero. 
+\begin{itemize}
+	\item The Bayesian decision interval is then forced to include zero if there is overwhelming ovidence that  $\beta_i$ is 0
+	\item equivalently the local fdr score$P(\beta_i =0 | \boldsymbol{Y})$ is large.
+	\item Local fdr score is compared to a tuning parameter $k_2$ used in loss function
+	\item the zero component is included in the interval if the local fdr score is greater than $k_2$
+\end{itemize}
+We determine the $k_2$ so that the posterior false coverage rate(PFCR) or the Bayes false coverage rate(BFCR) is controlled at a desired level. 
+$k_2$ is often larger than $\alpha$, the proposed interval doesn't have to include zero even $ P(\beta_i =0 | \boldsymbol{Y}) > \alpha$
+
+\section{Traditional Bayes Credible Intervals}
+There is two measures of false coverage. First one is Posterior False Coverage Rate(PFCR) and second one is Bayeian False Coverage Rate(BFCR)
+
+Let
+\begin{itemize}
+	\item $\mathcal{R}(\boldsymbol{Y})$ be the set of indices of the parameters selected based on the observation $\boldsymbol{Y}$
+	\item $R$ is the total count of $\mathcal{R}(\boldsymbol{Y})$
+	\item Given the credible intervals $CI_i$ for $\beta_i,\; i \in\ \mathcal{R}(\boldsymbol{Y})$
+	\item $\mathcal{V}$ consist of $ i \in\ \mathcal{R}(\boldsymbol{Y})$ such that $\beta_i \notin CI_i$
+	\item $V$ is the total count of $\mathcal{V}$
+	\item $Q$ is the proportion of the selected parameters that are not covered by their respective intervals $Q = V / R$ if $\;R >0$, and $Q=0$ if $\;R=0$
+\end{itemize}
+
+\subsection{False Coverage Rate}
+\begin{align*}
+FCR = E[Q | \beta]
+\end{align*}
+Measure of false coverage among the selected parameters in a frequentist sense.
+\subsection{PFCR}
+\begin{align*}
+PFCR(\boldsymbol{Y}) = E[Q | \boldsymbol{Y}] =  \begin{cases} \frac{1}{R} \sum_{i \in \mathcal{R}}P(\beta_i \notin CI_i | \boldsymbol{Y}) &\text{if $R >0$} \\
+0 &\text{if R = 0} \end{cases}
+\end{align*}
+
+\subsection{BFCR}
+\begin{align*}
+BFCR = \int PFCR(\boldsymbol{Y}) m(\boldsymbol{Y})\boldsymbol{d} \boldsymbol{Y}
+\end{align*}
+where $m(\boldsymbol{Y})$ is the marginal density of $\boldsymbol{Y}$\\
+
+if $P(\beta_i \notin CI_i | \boldsymbol{Y}) \le \alpha$ for all $i = 1,2, \dots ,p$ then both PFCR and BFCR are less than or equal to $\alpha$ for any selection rule $\mathcal{R}(\boldsymbol{Y})$. Thus $100(1-\alpha)\%$ credible intervals obtained from posterior can avoid adjusting for selection rule, but do not have good inferential properties.\\
+
+let $\psi(\beta_i|\boldsymbol{Y},\beta_i \ne 0)$ be the posterior distribution of $\beta_i$ given $\beta_i \ne 0$
+\begin{align*}
+\psi(\beta_i | \boldsymbol{Y}) = fdr_i(\boldsymbol{Y})1(\beta_i=0) + (1 - fdr_i(\boldsymbol{Y}))\psi(\beta_i|\boldsymbol{Y},\beta_i \ne 0)
+\end{align*}
+$fdr_i(\boldsymbol{Y}) $ and $\psi(\beta_i|\boldsymbol{Y}$ need to MCMC.\\
+
+\textbf{Theroem 1.} Let $CI_i$ be a posterior interval for $\beta_i$ such that $P(\beta_i \notin CI_i | \boldsymbol{Y}) \le \alpha$ . If $fdr_i(\boldsymbol{Y}) >\alpha$, then $0\in CI_i$
+
+
+\end{document}
